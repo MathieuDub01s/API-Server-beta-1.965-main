@@ -20,7 +20,7 @@
 
         .header {
             display: grid;
-            grid-template-columns: repeat(27, auto);
+            grid-template-columns: 6vh auto auto 6vh;
             align-items: center;
             padding: 4px;
         }
@@ -57,22 +57,74 @@
         .link:hover {
             font-weight: bold;
         }
-/*hello*/
-        div {
-            border: 1px solid red;
+        #icon_principal{
+            font-size:5vh;
+            margin-right:2vh;
+            color:blue;
         }
+        #createPost{
+            margin-left:5vh
+        }
+        /*div {
+            border: 1px solid red;
+        }*/
+        .editCmd, .deleteCmd{
+            font-size: 1.5rem;
+            -webkit-text-stroke-color: white;
+            -webkit-text-fill-color: rgb(0, 87, 204);
+            text-align: center;
+            margin: 8px;
+            cursor: pointer;
+
+        }
+        .postCommandPanel {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        .postLayout{
+            display: grid;
+            grid-template-columns: 1fr;
+            padding: 10px;
+            gap: 8px;
+            align-items: center;
+
+        }
+        .postContainer {
+            display: grid;
+            grid-template-columns: 4fr 1fr;
+            align-items: top;
+            
+            border-radius: 6px;
+        }
+        .postRow {
+            padding: 8px;
+            padding-bottom: 0px;
+            scroll-snap-align: start;
+        }
+        .postCategory{
+            color:blue;
+        }
+        .postTitle{
+            font-weight: bold;
+        }
+
+
     </style>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 
 <body>
     <div class="mainContainer">
         <div class="header">
-            <div>Nouvelles</div>
+            <i id="icon_principal"class="fa-solid fa-newspaper"></i>
+            <div> Nouvelles</div>
+            <input type="text" id="recherche"placeholder="Recherche">
             <div class="cmdIcon fa fa-plus" id="createPost" title="Ajouter une nouvelle"></div>
-
+            
             <!--
             <div class="letter link">*</div>
             <div class="letter link">A</div>
@@ -248,8 +300,11 @@
         //if (currentLetter != "*") queryString += `&Val=${currentLetter}*`;
         let posts = await webAPI_GET(queryString);
         if (posts.length > 0) {
+            console.log(posts.length);
             posts.forEach(post => {
-                $("#wordsPanel").append("<div class='link word' data-placement='bottom' title='" + post.Title + "'>" + post.Text + "</div>"); //mettre les boutons updates et supprimer
+                console.log("hello");
+               // $("#wordsPanel").append("<div data-placement='bottom' title='" + post.Title + "'>" + post.Title + "</div>"); //mettre les boutons updates et supprimer
+               $("#wordsPanel").append(renderPost(post))
             });
             $(".word").click(function () {
                 showDefinition($(this).html(), $(this).attr('title'));
@@ -259,4 +314,5 @@
 
 </script>
 <script src="js/API_Posts.js"></script>
+<script src="js/siteUI.js"></script>
 </html>

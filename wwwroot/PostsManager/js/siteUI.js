@@ -61,7 +61,7 @@ async function renderPosts() {
             saveContentScrollPosition();
             renderDeletePostForm($(this).attr("deletePostId"));
         });
-        $(".contactRow").on("click", function (e) { e.preventDefault(); })
+        $(".postRow").on("click", function (e) { e.preventDefault(); })
     } else {
         renderError("Service introuvable");
     }
@@ -153,13 +153,13 @@ function newPost() {
     post.Creation = "";
     return post;
 }
-function renderPostForm(contact = null) {
+function renderPostForm(post = null) {
     $("#createPost").hide();
     $("#abort").show();
     eraseContent();
     let create = post == null;
     if (create) {
-        post = newContact();
+        post = newPost();
         post.Image = "images/no-avatar.png";
     }
     $("#actionTitle").text(create ? "Création" : "Modification");
@@ -221,19 +221,20 @@ function renderPost(post) {
     return $(`
      <div class="postRow" post_id=${post.Id}">
         <div class="postContainer noselect">
-            <div class="contactLayout">
-                 <div class="avatar" style="background-image:url('${contact.Avatar}')"></div>
-                 <div class="contactInfo">
-                    <span class="contactName">${contact.Name}</span>
-                    <span class="contactPhone">${contact.Phone}</span>
-                    <a href="mailto:${contact.Email}" class="contactEmail" target="_blank" >${contact.Email}</a>
-                </div>
+            <div class="postLayout">
+             <span class="postCategory">${post.Category}</span>
+                <div class="postTitle">${post.Title}</div>
+                <div class="postImage" style="background-image:url('${post.Image}')"></div>
+                <span class="postDate">${post.Creation}</span>
+                <div class="postText">${post.Text}</div>
             </div>
-            <div class="contactCommandPanel">
-                <span class="editCmd cmdIcon fa fa-pencil" editContactId="${contact.Id}" title="Modifier ${contact.Name}"></span>
-                <span class="deleteCmd cmdIcon fa fa-trash" deleteContactId="${contact.Id}" title="Effacer ${contact.Name}"></span>
-            </div>
+
+            <div class="postCommandPanel">
+                <span class="editCmd cmdIcon fa-solid fa-square-pen" editPostId="${post.Id}" title="Modifier ${post.Title}"></span>
+                <span class="deleteCmd cmdIcon fa-solid fa-square-xmark" deletePostId="${post.Id}" title="Effacer ${post.Title}"></span>
+            </div>   
         </div>
-    </div>           
+    </div>    
+     
     `);
 }
