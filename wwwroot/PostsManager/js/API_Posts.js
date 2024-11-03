@@ -35,7 +35,7 @@ function API_SavePost(post, create) {
         });
     });
 }
-function API_DeleteContact(id) {
+function API_DeletePost(id) {
     return new Promise(resolve => {
         $.ajax({
             url: API_URL + "/" + id,

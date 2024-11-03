@@ -3,13 +3,13 @@ let contentScrollPosition = 0;
 Init_UI();
 
 function Init_UI() {
-    renderPosts();
+    //renderPosts();
     $('#createPost').on("click", async function () {
         saveContentScrollPosition();
         renderCreatePostForm();
     });
     $('#abort').on("click", async function () {
-        renderPosts();
+        //renderPosts();
     });
     $('#aboutCmd').on("click", function () {
         renderAbout();
@@ -40,32 +40,32 @@ function renderAbout() {
             </div>
         `))
 }
-async function renderPosts() {
-    showWaitingGif();
-    $("#actionTitle").text("Liste des nouvelle");
-    $("#createPost").show();
-    $("#abort").hide();
-    let posts = await API_GetPosts();
-    eraseContent();
-    if (posts !== null) {
-        posts.forEach(post => {
-            $("#content").append(renderPost(post));
-        });
-        restoreContentScrollPosition();
-        // Attached click events on command icons
-        $(".editCmd").on("click", function () {
-            saveContentScrollPosition();
-            renderEditPostForm($(this).attr("editPostId"));
-        });
-        $(".deleteCmd").on("click", function () {
-            saveContentScrollPosition();
-            renderDeletePostForm($(this).attr("deletePostId"));
-        });
-        $(".postRow").on("click", function (e) { e.preventDefault(); })
-    } else {
-        renderError("Service introuvable");
-    }
-}
+// async function renderPosts() {
+//     showWaitingGif();
+//     $("#actionTitle").text("Liste des nouvelle");
+//     $("#createPost").show();
+//     $("#abort").hide();
+//     let posts = await API_GetPosts();
+//     eraseContent();
+//     if (posts !== null) {
+//         posts.forEach(post => {
+//             $("#content").append(renderPost(post));
+//         });
+//         restoreContentScrollPosition();
+//         // Attached click events on command icons
+//         $(".editCmd").on("click", function () {
+//             saveContentScrollPosition();
+//             renderEditPostForm($(this).attr("editPostId"));
+//         });
+//         $(".deleteCmd").on("click", function () {
+//             saveContentScrollPosition();
+//             renderDeletePostForm($(this).attr("deletePostId"));
+//         });
+//         $(".postRow").on("click", function (e) { e.preventDefault(); })
+//     } else {
+//         renderError("Service introuvable");
+//     }
+// }
 function showWaitingGif() {
     eraseContent();
     $("#content").append($("<div class='waitingGifcontainer'><img class='waitingGif' src='Loading_icon.gif' /></div>'"));
@@ -132,12 +132,13 @@ async function renderDeletePostForm(id) {
             showWaitingGif();
             let result = await API_DeletePost(post.Id);
             if (result)
-                renderPosts();
+                console.log('Ok');
+                //renderPosts();
             else
                 renderError("Une erreur est survenue!");
         });
         $('#cancel').on("click", function () {
-            renderPosts();
+            //renderPosts();
         });
     } else {
         renderError("Post introuvable!");
@@ -199,12 +200,13 @@ function renderPostForm(post = null) {
         showWaitingGif();
         let result = await API_SavePost(post, create);
         if (result)
-            renderPosts();
+            console.log('ok');
+            //renderPosts();
         else
             renderError("Une erreur est survenue! " + API_getcurrentHttpError());
     });
     $('#cancel').on("click", function () {
-        renderPosts();
+        //renderPosts();
     });
 }
 
@@ -235,6 +237,5 @@ function renderPost(post) {
             </div>   
         </div>
     </div>    
-     
     `);
 }

@@ -95,7 +95,7 @@
             display: grid;
             grid-template-columns: 4fr 1fr;
             align-items: top;
-            
+
             border-radius: 6px;
         }
         .postRow {
@@ -124,7 +124,7 @@
             <div> Nouvelles</div>
             <input type="text" id="recherche"placeholder="Recherche">
             <div class="cmdIcon fa fa-plus" id="createPost" title="Ajouter une nouvelle"></div>
-            
+
             <!--
             <div class="letter link">*</div>
             <div class="letter link">A</div>
@@ -270,35 +270,32 @@
                 currentLetter = selectedLetter;*/
             pageManager.reset();
         })
-
     //})
-
     function showDefinition(word, definition) {
         $('#showDefinition').dialog('option', 'title', word);
         $('#definition').html(definition);
         $("#showDefinition").dialog('open');
     }
-
-    function webAPI_GET(queryString) {
-        return new Promise(resolve => {
-            $.ajax({
-                url: "http://localhost:5000/api/posts" + queryString,
-                type: 'GET',
-                contentType: 'text/plain',
-                data: {},
-                success: words => {
-                    resolve(words)
-                },
-                error: (jqXHR, textStatus, errorThrown) => {
-                    console.log("webAPI_GET_ALL - error", jqXHR.status);
-                    resolve(null);
-                }
-            });
-        })
-    }
+    // function webAPI_GET(queryString) {
+    //     return new Promise(resolve => {
+    //         $.ajax({
+    //             url: "http://localhost:5000/api/posts" + queryString,
+    //             type: 'GET',
+    //             contentType: 'text/plain',
+    //             data: {},
+    //             success: posts => {
+    //                 resolve(posts)
+    //             },
+    //             error: (jqXHR, textStatus, errorThrown) => {
+    //                 console.log("webAPI_GET_ALL - error", jqXHR.status);
+    //                 resolve(null);
+    //             }
+    //         });
+    //     })
+    // }
     async function getPosts(queryString) {
         //if (currentLetter != "*") queryString += `&Val=${currentLetter}*`;
-        let posts = await webAPI_GET(queryString);
+        let posts = await API_GetPosts();
         if (posts.length > 0) {
             console.log(posts.length);
             posts.forEach(post => {
@@ -306,9 +303,9 @@
                // $("#wordsPanel").append("<div data-placement='bottom' title='" + post.Title + "'>" + post.Title + "</div>"); //mettre les boutons updates et supprimer
                $("#wordsPanel").append(renderPost(post))
             });
-            $(".word").click(function () {
-                showDefinition($(this).html(), $(this).attr('title'));
-            });
+            // $(".word").click(function () {
+            //     showDefinition($(this).html(), $(this).attr('title'));
+            // });
         }
     }
 
