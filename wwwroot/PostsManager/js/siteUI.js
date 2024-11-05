@@ -69,7 +69,7 @@ async function renderPosts(queryString) {
     else
         if (posts.length > 0) {
             posts.forEach(post => {
-                $("#postPanel").append(renderWord(post));
+                $("#postPanel").append(renderPost(post));
             });
         }
     removeWaitingGif();
@@ -88,7 +88,7 @@ function renderPost(post) {
                  <div></div>
                  <div class="postInfo">
                     <span>${post.Category}</span>
-                    <span>${word.Title}</span>                   
+                    <span>${post.Title}</span>                   
                 </div>
             </div>      
         </div>
