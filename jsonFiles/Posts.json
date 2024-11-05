@@ -6,5 +6,13 @@
         "Image": "nouvelles_policiere.jpg",
         "Creation":2024,
         "Title": "Intervention policière mortelle à Trois-Rivières: le BEI déclenche une enquête"
+    },
+    {
+        "Id": "2",
+        "Text": "Futurama Nouvelle saison",
+        "Category":"Justice",
+        "Image": "futurama.jpg",
+        "Creation":2024,
+        "Title": "Futurama revient!"
     }
 ]

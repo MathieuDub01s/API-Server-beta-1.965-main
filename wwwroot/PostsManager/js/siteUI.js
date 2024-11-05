@@ -91,7 +91,6 @@ function renderPost(post) {
                 <span class="postDate">${post.Creation}</span>
                 <div class="postText">${post.Text}</div>
             </div>
-
             <div class="postCommandPanel">
                 <span class="editCmd cmdIcon fa-solid fa-square-pen" editPostId="${post.Id}" title="Modifier ${post.Title}"></span>
                 <span class="deleteCmd cmdIcon fa-solid fa-square-xmark" deletePostId="${post.Id}" title="Effacer ${post.Title}"></span>

@@ -1,4 +1,3 @@
-//const API_URL = "https://api-server-5.glitch.me/api/words";
 const API_URL = "http://localhost:5000/api/posts";
 class API {
     static initHttpState() {
@@ -14,7 +13,6 @@ class API {
         this.currentStatus = xhr.status;
         this.error = true;
     }
-
     static getPosts(query = "") {
         API.initHttpState();
         return new Promise(resolve => {
