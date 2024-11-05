@@ -30,8 +30,10 @@
 #search {
     display:grid;
     width: 190px;
-    grid-template-columns: 155px 30px;
+    grid-template-columns: 185px 30px;
     align-items: center;
+    justify-self:right;
+    margin-right:30px;
 }
 
 .wordRow {
