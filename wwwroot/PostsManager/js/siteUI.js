@@ -10,7 +10,7 @@ function Init_UI() {
         height: $("#sample").outerHeight()
     };
     pageManager = new PageManager('scrollPanel', 'postsPanel', postItemLayout, renderPosts);
-    $("#actionTitle").text("Mots");
+    $("#actionTitle").text("Nouvelles");
     $("#search").show();
     $("#abort").hide();
     $("#errorContainer").hide();
@@ -21,7 +21,7 @@ function Init_UI() {
         $("#abort").hide();
         $("#search").show();
         $("#scrollPanel").show();
-        $("#actionTitle").text("Mots");
+        $("#actionTitle").text("Nouvelles");
     });
     $('#aboutCmd').on("click", function () {
         renderAbout();
@@ -69,7 +69,7 @@ async function renderPosts(queryString) {
     else
         if (posts.length > 0) {
             posts.forEach(post => {
-                $("#postPanel").append(renderPost(post));
+                $("#postsPanel").append(renderPost(post));
             });
         }
     removeWaitingGif();
@@ -85,13 +85,18 @@ function renderPost(post) {
      <div class="postRow" post_id=${post.Id}">
         <div class="postContainer ">
             <div class="postLayout">
-                 <div></div>
-                 <div class="postInfo">
-                    <span>${post.Category}</span>
-                    <span>${post.Title}</span>                   
-                </div>
-            </div>      
+             <span class="postCategory">${post.Category}</span>
+                <div class="postTitle">${post.Title}</div>
+                <div class="postImage" style="background-image:url('${post.Image}')"></div>
+                <span class="postDate">${post.Creation}</span>
+                <div class="postText">${post.Text}</div>
+            </div>
+
+            <div class="postCommandPanel">
+                <span class="editCmd cmdIcon fa-solid fa-square-pen" editPostId="${post.Id}" title="Modifier ${post.Title}"></span>
+                <span class="deleteCmd cmdIcon fa-solid fa-square-xmark" deletePostId="${post.Id}" title="Effacer ${post.Title}"></span>
+            </div>   
         </div>
-    </div>           
+    </div>       
     `);
 }
