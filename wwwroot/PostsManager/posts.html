@@ -1,315 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta author="Rosalie Boyer et Mathieu Dubois">
-    <meta http-equiv="Content-Type" content="text/html; charset= ISO-8859-1">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nouvelles</title>
-    <style>
-        .mainContainer {
-            display: flex;
-            flex-direction: column;
-            max-width: 1220px;
-            margin: auto;
-            background-color: rgb(255, 255, 255);
-            height: 100vh;
-            border: 1px solid lightgray;
-        }
-
-        .header {
-            display: grid;
-            grid-template-columns: 6vh auto auto 6vh;
-            align-items: center;
-            padding: 4px;
-        }
-
-        .scrollContainer {
-            margin-top: 0px;
-            overflow-x: hidden;
-            overflow-y: scroll;
-            border-top: 1px solid lightgray;
-            height: inherit;
-        }
-
-        .wordsContainer {
-            margin: auto;
-            margin-left: 8px;
-            max-width: 1600px;
-            width: 100%;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, 230px);
-        }
-
-        .word {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            height: 23px;
-        }
-
-        .link {
-            cursor: pointer;
-            font-size: 15px;
-        }
-
-        .link:hover {
-            font-weight: bold;
-        }
-        #icon_principal{
-            font-size:5vh;
-            margin-right:2vh;
-            color:blue;
-        }
-        #createPost{
-            margin-left:5vh
-        }
-        /*div {
-            border: 1px solid red;
-        }*/
-        .editCmd, .deleteCmd{
-            font-size: 1.5rem;
-            -webkit-text-stroke-color: white;
-            -webkit-text-fill-color: rgb(0, 87, 204);
-            text-align: center;
-            margin: 8px;
-            cursor: pointer;
-
-        }
-        .postCommandPanel {
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-end;
-            gap: 8px;
-        }
-        .postLayout{
-            display: grid;
-            grid-template-columns: 1fr;
-            padding: 10px;
-            gap: 8px;
-            align-items: center;
-
-        }
-        .postContainer {
-            display: grid;
-            grid-template-columns: 4fr 1fr;
-            align-items: top;
-
-            border-radius: 6px;
-        }
-        .postRow {
-            padding: 8px;
-            padding-bottom: 0px;
-            scroll-snap-align: start;
-        }
-        .postCategory{
-            color:blue;
-        }
-        .postTitle{
-            font-weight: bold;
-        }
-
-
-    </style>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="site.webmanifest" href="manifest.json" />
+    <link rel="icon" href="dict-logo.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/site.css">
+    <link rel="stylesheet" href="css/words.css">
 </head>
 
 <body>
-    <div class="mainContainer">
-        <div class="header">
-            <i id="icon_principal"class="fa-solid fa-newspaper"></i>
-            <div> Nouvelles</div>
-            <input type="text" id="recherche"placeholder="Recherche">
-            <div class="cmdIcon fa fa-plus" id="createPost" title="Ajouter une nouvelle"></div>
+    <div id="main">
+        <div id="header">
+            <img src="dict-logo.png" class="appLogo" alt="" title="Dictionnaire de mots">
+            <h4 id="actionTitle">Mots</h4>
 
-            <!--
-            <div class="letter link">*</div>
-            <div class="letter link">A</div>
-            <div class="letter link">B</div>
-            <div class="letter link">C</div>
-            <div class="letter link">D</div>
-            <div class="letter link">E</div>
-            <div class="letter link">F</div>
-            <div class="letter link">G</div>
-            <div class="letter link">H</div>
-            <div class="letter link">I</div>
-            <div class="letter link">J</div>
-            <div class="letter link">K</div>
-            <div class="letter link">L</div>
-            <div class="letter link">M</div>
-            <div class="letter link">N</div>
-            <div class="letter link">O</div>
-            <div class="letter link">P</div>
-            <div class="letter link">Q</div>
-            <div class="letter link">R</div>
-            <div class="letter link">S</div>
-            <div class="letter link">T</div>
-            <div class="letter link">U</div>
-            <div class="letter link">V</div>
-            <div class="letter link">W</div>
-            <div class="letter link">X</div>
-            <div class="letter link">Y</div>
-            <div class="letter link">Z</div>-->
+            <div id="search">
+                <input type="search" id="searchKey" placeholder="Mots-clés" />
+                <i for="searchKey" id="doSearch" class="cmdIcon fa fa-search"></i>
+            </div>
+
+            <i id="abort" class="cmdIcon fa fa-times" title="Annuler"></i>
+            <div class="dropdown ms-auto">
+                <div data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="cmdIcon fa fa-ellipsis-vertical"></i>
+                </div>
+                <div class="dropdown-menu noselect">
+                    <div class="dropdown-item" id="aboutCmd">
+                        <i class="menuIcon fa fa-info-circle mx-2"></i> À propos...
+                    </div>
+                </div>
+            </div>
         </div>
-        <div id="scrollPanel" class="scrollContainer">
-            <div id="wordsPanel" class="wordsContainer">
-                <!-- Used for items size -->
-                <div id="sample" class="word"></div>
+        <div id="content">
+            <div id="scrollPanel">
+                <div id="postsPanel" class="postsContainer">
+                    <!-- Used for items size -->
+                    <div id="sample" class="postRow" word_id="${post.Id}">
+                        <div class="postContainer ">
+                            <div class="postLayout">
+                                 <div></div>
+                                 <div class="postInfo">
+                                    <span>sample</span>
+                                    <span>sample def</span>                   
+                                </div>
+                            </div>      
+                        </div>
+                    </div>      
+                </div>
+            </div>
+            <div id='aboutContainer' class="aboutContainer">
+                <h2>Dictionnaire de mots</h2>
+                <hr>
+                <br>
+                <p>
+                    Petite application à titre de démonstration
+                    d'interface utilisateur monopage réactive avec
+                    défilement infinie.
+                </p>
+                <p>
+                    Auteur: Nicolas Chourot
+                </p>
+                <p>
+                    Collège Lionel-Groulx, automne 2023
+                </p>
+            </div>
+            <div id="errorContainer" class="errorContainer">
+
             </div>
         </div>
     </div>
-    <div id='showDefinition'>
-        <div id='definition'></div>
-    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.maskedinput/1.4.1/jquery.maskedinput.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script src="js/API_Posts.js"></script>
+    <script src="js/pageManager.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/siteUI.js"></script>
 </body>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-<script>
-
-    let currentLetter = "";
-    let wordItemLayout = {
-        // https://www.w3schools.com/jquery/jquery_dimensions.asp
-        width: $("#sample").outerWidth(),
-        height: $("#sample").outerHeight()
-    };
-    let pageManager;
-
-    class PageManager {
-        constructor(scrollPanelId, itemsPanelId, itemLayout, getItemsCallBack) {
-            this.scrollPanel = $(`#${scrollPanelId}`);
-            this.itemsPanel = $(`#${itemsPanelId}`);
-            this.itemLayout = itemLayout;
-            this.currentPage = { limit: -1, offset: -1 };
-            this.resizeTimer = null;
-            this.resizeEndTriggerDelai = 300;
-            this.getItems = getItemsCallBack;
-            this.installViewportReziseEvent();
-            this.reset();
-        }
-        reset() {
-            this.resetScrollPosition();
-            this.update(false);
-        }
-        installViewportReziseEvent() {
-            let instance = this;
-            $(window).on('resize', function (e) {
-                clearTimeout(instance.resizeTimer);
-                instance.resizeTimer = setTimeout(() => { instance.update(false); }, instance.resizeEndTriggerDelai);
-            });
-        }
-        setCurrentPageLimit() {
-            let nbColumns = Math.trunc(this.scrollPanel.innerWidth() / this.itemLayout.width);
-            if (nbColumns < 1) nbColumns = 1;
-            let nbRows = Math.round(this.scrollPanel.innerHeight() / this.itemLayout.height);
-            this.currentPage.limit = nbRows * nbColumns + nbColumns /* make sure to always have a content overflow */;
-        }
-        currentPageToQueryString(append = false) {
-            this.setCurrentPageLimit();
-            let limit = this.currentPage.limit;
-            let offset = this.currentPage.offset;
-            if (!append) {
-                limit = limit * (offset + 1);
-                offset = 0;
-            }
-            return `?limit=${limit}&offset=${offset}`;
-        }
-        scrollPosition() {
-            return this.scrollPanel.scrollTop();
-        }
-        storeScrollPosition() {
-            this.scrollPanel.off();
-            this.previousScrollPosition = this.scrollPosition();
-        }
-        resetScrollPosition() {
-            this.currentPage.offset = 0;
-            this.scrollPanel.off();
-            this.scrollPanel.scrollTop(0);
-        }
-        restoreScrollPosition() {
-            this.scrollPanel.off();
-            this.scrollPanel.scrollTop(this.previousScrollPosition);
-        }
-        async update(append = true) {
-            this.storeScrollPosition();
-            if (!append) this.itemsPanel.empty();
-            await this.getItems(this.currentPageToQueryString(append));
-            this.restoreScrollPosition();
-
-            let instance = this;
-            this.scrollPanel.scroll(function () {
-                if (instance.scrollPanel.scrollTop() + instance.scrollPanel.outerHeight() >= instance.itemsPanel.outerHeight()) {
-                    instance.scrollPanel.off();
-                    instance.currentPage.offset++;
-                    instance.update(true);
-                }
-            });
-        }
-    }
-
-    $(document).ready(function () {
-        pageManager = new PageManager('scrollPanel', 'wordsPanel', wordItemLayout, getPosts);
-        $("#showDefinition").dialog({
-            autoOpen: false,
-            show: { effect: 'fade', speed: 400 },
-            hide: { effect: 'fade', speed: 400 },
-        });
-       /* $('.letter').click(function () {
-            $("#showDefinition").dialog('close');
-            offset = 0;
-            $('.letter').css('color', 'black');
-            $('.letter').css('font-weight', 'normal');
-            $(this).css('color', 'blue');
-            $(this).css('font-weight', 'bold');
-            let selectedLetter = $(this).html();
-            if (selectedLetter == "*")
-                currentLetter = "";
-            else
-                currentLetter = selectedLetter;*/
-            pageManager.reset();
-        })
-    //})
-    function showDefinition(word, definition) {
-        $('#showDefinition').dialog('option', 'title', word);
-        $('#definition').html(definition);
-        $("#showDefinition").dialog('open');
-    }
-    // function webAPI_GET(queryString) {
-    //     return new Promise(resolve => {
-    //         $.ajax({
-    //             url: "http://localhost:5000/api/posts" + queryString,
-    //             type: 'GET',
-    //             contentType: 'text/plain',
-    //             data: {},
-    //             success: posts => {
-    //                 resolve(posts)
-    //             },
-    //             error: (jqXHR, textStatus, errorThrown) => {
-    //                 console.log("webAPI_GET_ALL - error", jqXHR.status);
-    //                 resolve(null);
-    //             }
-    //         });
-    //     })
-    // }
-    async function getPosts(queryString) {
-        //if (currentLetter != "*") queryString += `&Val=${currentLetter}*`;
-        let posts = await API_GetPosts();
-        if (posts.length > 0) {
-            console.log(posts.length);
-            posts.forEach(post => {
-                console.log("hello");
-               // $("#wordsPanel").append("<div data-placement='bottom' title='" + post.Title + "'>" + post.Title + "</div>"); //mettre les boutons updates et supprimer
-               $("#wordsPanel").append(renderPost(post))
-            });
-            // $(".word").click(function () {
-            //     showDefinition($(this).html(), $(this).attr('title'));
-            // });
-        }
-    }
-
-</script>
-<script src="js/API_Posts.js"></script>
-<script src="js/siteUI.js"></script>
 </html>
