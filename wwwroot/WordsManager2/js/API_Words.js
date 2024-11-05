@@ -20,7 +20,7 @@ class API {
         return new Promise(resolve => {
             $.ajax({
                 url: API_URL + query,
-                success: words => { resolve(words); },
+                success: words => { resolve(words);},
                 error: (xhr) => { API.setHttpErrorState(xhr); resolve(null); }
             });
         });

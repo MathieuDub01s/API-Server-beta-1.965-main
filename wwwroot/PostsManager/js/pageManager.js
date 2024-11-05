@@ -25,6 +25,7 @@ class PageManager {
     setCurrentPageLimit() {
         let nbColumns = Math.trunc(this.scrollPanel.innerWidth() / this.itemLayout.width);
         if (nbColumns < 1) nbColumns = 1;
+        let sph = this.scrollPanel.innerHeight();
         let nbRows = Math.round(this.scrollPanel.innerHeight() / this.itemLayout.height);
         this.currentPage.limit = nbRows * nbColumns + nbColumns /* make sure to always have a content overflow */;
     }
@@ -35,13 +36,18 @@ class PageManager {
         if (!append) {
             limit = limit * (offset + 1);
             offset = 0;
+           
         }
         return `?limit=${limit}&offset=${offset}`;
     }
     scrollToElem(elemId) {
-        this.scrollPanel.animate({ 
-            scrollTop : $("#" + elemId).offset().top - this.scrollPanel.offset().top 
-        },300);
+        let itemToReach = $("#" + elemId);
+        if (itemToReach) {
+            let itemsContainer = itemToReach.parent();
+            this.scrollPanel.animate({
+                scrollTop: itemToReach.offset().top - itemsContainer.offset().top
+            }, 500);
+        }
     }
     scrollPosition() {
         return this.scrollPanel.scrollTop();

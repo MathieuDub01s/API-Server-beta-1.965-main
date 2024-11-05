@@ -68,6 +68,7 @@ async function renderPosts(queryString) {
         renderError(API.currentHttpError);
     else
         if (posts.length > 0) {
+           
             posts.forEach(post => {
                 $("#postsPanel").append(renderPost(post));
             });
@@ -75,7 +76,7 @@ async function renderPosts(queryString) {
     removeWaitingGif();
 }
 function addWaitingGif() {
-    $("#postPanel").append($("<div id='waitingGif' class='waitingGifcontainer'><img class='waitingGif' src='Loading_icon.gif' /></div>'"));
+    $("#postsPanel").append($("<div id='waitingGif' class='waitingGifcontainer'><img class='waitingGif' src='Loading_icon.gif' /></div>'"));
 }
 function removeWaitingGif() {
     $("#waitingGif").remove('');

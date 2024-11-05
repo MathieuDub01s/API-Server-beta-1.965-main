@@ -42,3 +42,8 @@
 hr {
     margin:0px;
 }
+
+.postRow{
+    height:450px;
+    border:2px solid red;
+}

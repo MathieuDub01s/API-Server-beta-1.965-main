@@ -58,6 +58,7 @@ export default class Response {
         else
             this.res.writeHead(200, { 'content-type': 'application/json' });
         if (obj != null) {
+            console.log(obj);
             if (!fromCache)
                 this.addInRequestsCache(obj, ETag)
             let content = JSON.stringify(obj);

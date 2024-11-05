@@ -27,6 +27,7 @@ class API {
     }
     static getPost(postId) {
         API.initHttpState();
+        
         return new Promise(resolve => {
             $.ajax({
                 url: API_URL + "/" + postId,
