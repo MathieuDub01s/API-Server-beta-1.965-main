@@ -68,7 +68,7 @@ async function renderPosts(queryString) {
         renderError(API.currentHttpError);
     else
         if (posts.length > 0) {
-           
+
             posts.forEach(post => {
                 $("#postsPanel").append(renderPost(post));
             });
@@ -84,19 +84,22 @@ function removeWaitingGif() {
 function renderPost(post) {
     return $(`
      <div class="postRow" post_id=${post.Id}">
-        <div class="postContainer ">
+        <div class="postContainer noselect">
             <div class="postLayout">
-             <span class="postCategory">${post.Category}</span>
-                <div class="postTitle">${post.Title}</div>
+                <div class="postInfo">
+                    <span class="postCategory">${post.Category}</span>
+                    <div class="postCommandPanel">
+                        <span class="editCmd cmdIcon fa-solid fa-square-pen" editPostId="${post.Id}" title="Modifier ${post.Title}"></span>
+                        <span class="deleteCmd cmdIcon fa-solid fa-square-xmark" deletePostId="${post.Id}" title="Effacer ${post.Title}"></span>
+                    </div>   
+                </div>
+                <div class="postTitle">${post.Title}
                 <div class="postImage" style="background-image:url('${post.Image}')"></div>
                 <span class="postDate">${post.Creation}</span>
                 <div class="postText">${post.Text}</div>
             </div>
-            <div class="postCommandPanel">
-                <span class="editCmd cmdIcon fa-solid fa-square-pen" editPostId="${post.Id}" title="Modifier ${post.Title}"></span>
-                <span class="deleteCmd cmdIcon fa-solid fa-square-xmark" deletePostId="${post.Id}" title="Effacer ${post.Title}"></span>
-            </div>   
         </div>
-    </div>       
+    </div> 
+         
     `);
 }

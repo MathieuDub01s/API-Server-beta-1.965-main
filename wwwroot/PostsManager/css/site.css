@@ -73,19 +73,20 @@
     box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
 }
 
-.contactRow {
+.postRow {
     padding: 8px;
     padding-bottom: 0px;
-    scroll-snap-align: start;
+    margin-bottom:20px;
+   /* scroll-snap-align: start;*/
 }
 
-.contactContainer {
+/*.postContainer {
     display: grid;
     grid-template-columns: 4fr 1fr;
     align-items: top;
-    background-color: rgb(87, 140, 255);
+   background-color: rgb(87, 140, 255);
     border-radius: 6px;
-}
+}*/
 
 .waitingGifcontainer {
     text-align: center;
@@ -96,49 +97,38 @@
     height: 300px;
 }
 
-.contactContainer .cmdIcon {
+.postContainer .cmdIcon {
     display: none;
 }
 
-.contactContainer:hover .cmdIcon {
+.postContainer:hover .cmdIcon {
     display: block;
 }
 
-.contactLayout {
+.postLayout {
     display: grid;
-    grid-template-columns: 100px auto;
+    grid-template-columns: auto;
     padding: 10px;
     gap: 8px;
     align-items: center;
 }
 
-.contactInfo {
+/*.postInfo {
     display: grid;
     grid-template-columns: 1fr;
     padding: 10px;
     gap: 8px;
     align-items: center;
-}
+}*/
 
-.contactName {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: white;
-}
 
-.contactPhone {
-    color: white;
-}
+.postCommandPanel {
 
-.contactEmail {
-    color: white;
-}
-
-.contactCommandPanel {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
     gap: 8px;
+    height:20px;
 }
 
 .cmdIcon {
@@ -164,14 +154,7 @@
         grid-template-columns: 40% 35% auto;
     }
 }
-.avatar {
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    width: 90px;
-    height: 90px;
-    border-radius: 90px;
-}
+
 .postImage{
     background-size: cover;
     background-position: center;
@@ -212,14 +195,7 @@ input {
     margin-bottom: 20px !important;
 }
 
-.contactContainer a {
-    text-decoration: none !important;
-    color: white !important;
-}
 
-a {
-    text-decoration: none !important;
-}
 #scrollPanel {
     height: 100%;
     overflow-x: hidden;
@@ -227,4 +203,24 @@ a {
     overflow-y: auto;
     scrollbar-gutter: stable;
     scroll-snap-type: y mandatory;
+}
+.postCategory{
+    color:blue;
+    font-weight: bold;
+}
+.postTitle{
+    font-weight: bold;
+}
+.postDate{
+    font-weight: normal;
+    font-size: 12px;
+}
+.postText{
+    font-weight: normal;
+}
+
+.postInfo{
+    display:grid;
+    grid-template-columns: auto 100px;
+    align-items:baseline;
 }
