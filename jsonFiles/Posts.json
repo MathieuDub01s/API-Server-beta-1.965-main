@@ -9,10 +9,10 @@
     },
     {
         "Id": "2",
-        "Text": "1",
+        "Text": "Futurama Nouvelle saison",
         "Category":"Justice",
-        "Image": "nouvelles_policiere.jpg",
+        "Image": "futurama.jpg",
         "Creation":2024,
-        "Title": "Hello"
+        "Title": "Futurama revient!"
     }
 ]
