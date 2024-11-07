@@ -82,6 +82,7 @@ function removeWaitingGif() {
     $("#waitingGif").remove('');
 }
 function renderPost(post) {
+    let date = convertToFrenchDate(post.Creation); 
     return $(`
      <div class="postRow" post_id=${post.Id}">
         <div class="postContainer noselect">
@@ -95,11 +96,28 @@ function renderPost(post) {
                 </div>
                 <div class="postTitle">${post.Title}
                 <div class="postImage" style="background-image:url('${post.Image}')"></div>
-                <span class="postDate">${post.Creation}</span>
+                <span class="postDate">${date}</span>
                 <div class="postText">${post.Text}</div>
             </div>
         </div>
     </div> 
          
     `);
+}
+
+function convertToFrenchDate(numeric_date) {
+    date = new Date(numeric_date);
+    var options = { year: 'numeric', month: 'long', day: 'numeric' };
+    var opt_weekday = { weekday: 'long' };
+    var weekday = toTitleCase(date.toLocaleDateString("fr-FR", opt_weekday));
+
+    function toTitleCase(str) {
+        return str.replace(
+            /\w\S*/g,
+            function (txt) {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            }
+        );
+    }
+    return weekday + " le " + date.toLocaleDateString("fr-FR", options) + " @ " + date.toLocaleTimeString("fr-FR");
 }

@@ -13,6 +13,7 @@ import CachedRequests from "./cachedRequestsManager.js";
 
 let api_server_version = serverVariables.get("main.api_server_version");
 let hideHeadRequest = serverVariables.get("main.hideHeadRequest");
+global.Server_UTC_Offset = new Date().getTimezoneOffset() / 60;
 
 export default class APIServer {
     constructor(port = process.env.PORT || 5000) {
