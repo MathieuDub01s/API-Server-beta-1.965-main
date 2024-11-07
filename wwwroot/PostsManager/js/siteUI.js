@@ -176,15 +176,30 @@ function renderPostForm(post = null) {
             <label class="form-label">Image </label>
             <div   class='imageUploader' 
                    newImage='${create}' 
-                   controlId='Image' 
+                   controlId='Avatar' 
                    imageSrc='${post.Image}' 
-                   waitingImage="images/default_news.png">
+                   waitingImage="Loading_icon.gif">
             </div>
             <hr>
-            <input type="submit" value="Enregistrer" id="saveContact" class="btn btn-primary">
+            <input type="submit" value="Enregistrer" id="savePost" class="btn btn-primary">
             <input type="button" value="Annuler" id="cancel" class="btn btn-secondary">
         </form>
     `);
+    initImageUploaders();
+    initFormValidation(); // important do to after all html injection!
+    $('#contactForm').on("submit", async function (event) {
+        event.preventDefault();
+        let contact = getFormData($("#contactForm"));
+        showWaitingGif();
+        let result = await API_SaveContact(contact, create);
+        if (result)
+            renderContacts();
+        else
+            renderError("Une erreur est survenue! " + API_getcurrentHttpError());
+    });
+    $('#cancel').on("click", function () {
+        renderContacts();
+    });
 }
 function renderPost(post) {
     let date = convertToFrenchDate(post.Creation); 
