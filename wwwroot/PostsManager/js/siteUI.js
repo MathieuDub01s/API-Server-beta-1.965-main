@@ -16,12 +16,25 @@ function Init_UI() {
     $("#errorContainer").hide();
 
     $('#abort').on("click", async function () {
+        eraseContent();
         $("#aboutContainer").hide();
         $("#errorContainer").hide();
         $("#abort").hide();
         $("#search").show();
-        $("#scrollPanel").show();
+        $("#scrollPanel").show();        
+        $("#createPost").show();
         $("#actionTitle").text("Nouvelles");
+        $("#content").append(
+            $(`
+            <div id="scrollPanel">
+                <div id="postsPanel" class="postsContainer">
+       
+                </div>
+            </div>
+            `)
+        );
+    
+        renderPosts();
     });
     $('#aboutCmd').on("click", function () {
         renderAbout();
@@ -32,10 +45,17 @@ function Init_UI() {
     $('#doSearch').on('click', () => {
         doSearch();
     })
+    $('#createPost').on("click", async function () {
+        saveContentScrollPosition();
+        renderPostForm();
+    });
 }
 function doSearch() {
     search = $("#searchKey").val().replace(' ', ',');
     pageManager.reset();
+}
+function saveContentScrollPosition() {
+    contentScrollPosition = $("#content")[0].scrollTop;
 }
 function renderAbout() {
     $("#scrollPanel").hide();
@@ -81,6 +101,91 @@ function addWaitingGif() {
 function removeWaitingGif() {
     $("#waitingGif").remove('');
 }
+function eraseContent() {
+    $("#content").empty();
+}
+function newPost() {
+    post = {};
+    post.Id = 0;
+    post.Title = "";
+    post.Category = "";
+    post.Text = "";
+    post.Creation = "";
+    return post;
+}
+function renderPostForm(post = null) {
+    $("#createPost").hide();
+    $("#abort").show();
+    eraseContent();
+    let create = post == null;
+    if (create) {
+        post = newPost();
+        post.Image = "images/default_news.png";
+    }
+    $("#actionTitle").text(create ? "Création" : "Modification");
+    $("#content").append(`
+        <form class="form" id="PostForm">
+            <input type="hidden" name="Id" value="${post.Id}}"/>
+
+            <label for="Title" class="form-label">Titre </label>
+            <input 
+                class="form-control Alpha"
+                name="Title" 
+                id="Title" 
+                placeholder="Titre"
+                required
+                RequireMessage="Veuillez entrer un titre"
+                InvalidMessage="Le nom comporte un caractère illégal" 
+                value="${post.Title}"
+            />
+            <label for="Text" class="form-label">Texte </label>
+            <textarea
+                class="form-control Alpha"
+                name="Text" 
+                id="Text" 
+                placeholder="Texte"
+                required
+                RequireMessage="Veuillez entrer un texte"
+                InvalidMessage="Le texte comporte un caractère illégal" 
+                value="${post.Text}"
+            /></textarea>
+            <label for="Category" class="form-label">Catégorie </label>
+            <input 
+                class="form-control Alpha"
+                name="Category" 
+                id="Category"
+                placeholder="Catégorie"
+                required
+                RequireMessage="Veuillez entrer une catégorie"
+                InvalidMessage="La catégorie comporte un caractère illégal" 
+                value="${post.Category}"
+            />
+            <label for="Creation" class="form-label">Création </label>
+            <input 
+                class="form-control Alpha"
+                type="date"
+                name="Creation" 
+                id="Creation 
+                placeholder="Creation"
+                required
+                RequireMessage="Veuillez entrer une date"
+                InvalidMessage="La date comporte un caractère illégal" 
+                value="${post.Creation}"
+            />
+            <!-- nécessite le fichier javascript 'imageControl.js' -->
+            <label class="form-label">Image </label>
+            <div   class='imageUploader' 
+                   newImage='${create}' 
+                   controlId='Image' 
+                   imageSrc='${post.Image}' 
+                   waitingImage="images/default_news.png">
+            </div>
+            <hr>
+            <input type="submit" value="Enregistrer" id="saveContact" class="btn btn-primary">
+            <input type="button" value="Annuler" id="cancel" class="btn btn-secondary">
+        </form>
+    `);
+}
 function renderPost(post) {
     let date = convertToFrenchDate(post.Creation); 
     return $(`
@@ -104,7 +209,6 @@ function renderPost(post) {
          
     `);
 }
-
 function convertToFrenchDate(numeric_date) {
     date = new Date(numeric_date);
     var options = { year: 'numeric', month: 'long', day: 'numeric' };

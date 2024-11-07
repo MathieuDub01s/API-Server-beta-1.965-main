@@ -24,9 +24,7 @@
     height: 32px !important;
     vertical-align: middle;
 }
-#abort {
-    margin-left:160px;
-}
+
 #search {
     display:grid;
     width: 190px;
@@ -44,6 +42,6 @@ hr {
 }
 
 .postRow{
-    height:450px;
+    height:75vh;
     
 }
