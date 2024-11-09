@@ -125,7 +125,7 @@ function renderPostForm(post = null) {
     $("#actionTitle").text(create ? "Création" : "Modification");
     $("#content").append(`
         <form class="form" id="PostForm">
-            <input type="hidden" name="Id" value="${post.Id}}"/>
+            <input type="hidden" name="Id" value="${post.Id}"/>
 
             <label for="Title" class="form-label">Titre </label>
             <input 
@@ -187,20 +187,58 @@ function renderPostForm(post = null) {
     `);
     initImageUploaders();
     initFormValidation(); // important do to after all html injection!
-    $('#contactForm').on("submit", async function (event) {
+    $('#PostForm').on("submit", async function (event) {
         event.preventDefault();
-        let contact = getFormData($("#contactForm"));
-        showWaitingGif();
-        let result = await API_SaveContact(contact, create);
-        if (result)
-            renderContacts();
-        else
-            renderError("Une erreur est survenue! " + API_getcurrentHttpError());
+        let post = getFormData($("#PostForm"));
+        //showWaitingGif();
+        let result = await API.savePost(post, create);
+        if (result){
+            $("#content").append(
+                $(`
+                <div id="scrollPanel">
+                    <div id="postsPanel" class="postsContainer">
+           
+                    </div>
+                </div>
+                `)
+            );
+            renderPosts();
+        }
+        else{
+            renderError("Une erreur est survenue! " + API.setHttpErrorState());
+        }
     });
     $('#cancel').on("click", function () {
-        renderContacts();
+        eraseContent();
+        $("#aboutContainer").hide();
+        $("#errorContainer").hide();
+        $("#abort").hide();
+        $("#search").show();
+        $("#scrollPanel").show();        
+        $("#createPost").show();
+        $("#actionTitle").text("Nouvelles");
+        $('#content').empty();
+        $("#content").append(
+            $(`
+            <div id="scrollPanel">
+                <div id="postsPanel" class="postsContainer">
+       
+                </div>
+            </div>
+            `)
+        );
+        renderPosts();
     });
 }
+function getFormData($form) {
+    const removeTag = new RegExp("(<[a-zA-Z0-9]+>)|(</[a-zA-Z0-9]+>)", "g");
+    var jsonObject = {};
+    $.each($form.serializeArray(), (index, control) => {
+        jsonObject[control.name] = control.value.replace(removeTag, "");
+    });
+    return jsonObject;
+}
+
 function renderPost(post) {
     let date = convertToFrenchDate(post.Creation); 
     return $(`
