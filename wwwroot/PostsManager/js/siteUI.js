@@ -1,234 +1,241 @@
-let search = "";
-let endOfData = false;
+const periodicRefreshPeriod = 10;
+let categories = [];
+let selectedCategory = "";
+let currentETag = "";
+let hold_Periodic_Refresh = false;
 let pageManager;
+let waitingGifTrigger = 2000;
+let waiting = null;
+
+function addWaitingGif() {
+    clearTimeout(waiting);
+    waiting = setTimeout(() => {
+        $("#itemsPanel").append($("<div id='waitingGif' class='waitingGifcontainer'><img class='waitingGif' src='Loading_icon.gif' /></div>'"));
+    }, waitingGifTrigger)
+}
+function removeWaitingGif() {
+    clearTimeout(waiting);
+    $("#waitingGif").remove('');
+}
+
 Init_UI();
 
-function Init_UI() {
-    $('#aboutContainer').hide();
-    let postItemLayout = {
+async function Init_UI() {
+    let itemLayout = {
         width: $("#sample").outerWidth(),
         height: $("#sample").outerHeight()
     };
-    pageManager = new PageManager('scrollPanel', 'postsPanel', postItemLayout, renderPosts);
-    $("#actionTitle").text("Nouvelles");
-    $("#search").show();
-    $("#abort").hide();
-    $("#errorContainer").hide();
-
+    pageManager = new PageManager('scrollPanel', 'itemsPanel', itemLayout, renderPosts);
+    compileCategories();
+    $('#createPost').on("click", async function () {
+        renderCreatePostForm();
+    });
     $('#abort').on("click", async function () {
-        eraseContent();
-        $("#aboutContainer").hide();
-        $("#errorContainer").hide();
-        $("#abort").hide();
-        $("#search").show();
-        $("#scrollPanel").show();        
-        $("#createPost").show();
-        $("#actionTitle").text("Nouvelles");
-        $("#content").append(
-            $(`
-            <div id="scrollPanel">
-                <div id="postsPanel" class="postsContainer">
-       
-                </div>
-            </div>
-            `)
-        );
-    
-        renderPosts();
+        showPosts()
     });
     $('#aboutCmd').on("click", function () {
         renderAbout();
     });
-    $("#searchKey").on("change", () => {
-        doSearch();
-    })
-    $('#doSearch').on('click', () => {
-        doSearch();
-    })
-    $('#createPost').on("click", async function () {
-        saveContentScrollPosition();
-        renderPostForm();
-    });
+    showPosts();
+    $("#postForm").hide();
+    $("#aboutContainer").hide();
+    start_Periodic_Refresh();
 }
-function doSearch() {
-    search = $("#searchKey").val().replace(' ', ',');
-    pageManager.reset();
+function showPosts() {
+    $("#actionTitle").text("Liste des favoris");
+    $("#scrollPanel").show();
+    $('#abort').hide();
+    $('#postForm').hide();
+    $('#aboutContainer').hide();
+    $("#createPost").show();
+    hold_Periodic_Refresh = false;
 }
-function saveContentScrollPosition() {
-    contentScrollPosition = $("#content")[0].scrollTop;
+function hidePosts() {
+    $("#scrollPanel").hide();
+    $("#createPost").hide();
+    $("#abort").show();
+    hold_Periodic_Refresh = true;
+}
+function start_Periodic_Refresh() {
+    setInterval(async () => {
+        if (!hold_Periodic_Refresh) {
+            let etag = await Posts_API.HEAD();
+            if (currentETag != etag) {
+                currentETag = etag;
+                pageManager.update(false);
+                compileCategories();
+            }
+        }
+    },
+        periodicRefreshPeriod * 1000);
 }
 function renderAbout() {
-    $("#scrollPanel").hide();
-    $("#abort").show();
-    $("#search").hide();
+    hidePosts();
     $("#actionTitle").text("À propos...");
     $("#aboutContainer").show();
 }
-function renderError(message) {
-    removeWaitingGif();
-    $("#scrollPanel").hide();
-    $("#abort").show();
-    $("#search").hide();
-    $("#actionTitle").text("Erreur du serveur...");
-    $("#errorContainer").show();
-    $("#errorContainer").empty();
-    $("#errorContainer").append(
-        $(`
-            <span class="errorContainer">
-                ${message}
-            </span>
-        `)
-    );
+function updateDropDownMenu() {
+    let DDMenu = $("#DDMenu");
+    let selectClass = selectedCategory === "" ? "fa-check" : "fa-fw";
+    DDMenu.empty();
+    DDMenu.append($(`
+        <div class="dropdown-item menuItemLayout" id="allCatCmd">
+            <i class="menuIcon fa ${selectClass} mx-2"></i> Toutes les catégories
+        </div>
+        `));
+    DDMenu.append($(`<div class="dropdown-divider"></div>`));
+    categories.forEach(category => {
+        selectClass = selectedCategory === category ? "fa-check" : "fa-fw";
+        DDMenu.append($(`
+            <div class="dropdown-item menuItemLayout category" id="allCatCmd">
+                <i class="menuIcon fa ${selectClass} mx-2"></i> ${category}
+            </div>
+        `));
+    })
+    DDMenu.append($(`<div class="dropdown-divider"></div> `));
+    DDMenu.append($(`
+        <div class="dropdown-item menuItemLayout" id="aboutCmd">
+            <i class="menuIcon fa fa-info-circle mx-2"></i> À propos...
+        </div>
+        `));
+    $('#aboutCmd').on("click", function () {
+        renderAbout();
+    });
+    $('#allCatCmd').on("click", function () {
+        showPosts();
+        selectedCategory = "";
+        updateDropDownMenu();
+        pageManager.reset();
+    });
+    $('.category').on("click", function () {
+        showPosts();
+        selectedCategory = $(this).text().trim();
+        updateDropDownMenu();
+        pageManager.reset();
+    });
+}
+async function compileCategories() {
+    categories = [];
+    let response = await Posts_API.GetQuery("?fields=category&sort=category");
+    if (!Posts_API.error) {
+        let items = response.data;
+        if (items != null) {
+            items.forEach(item => {
+                if (!categories.includes(item.Category))
+                    categories.push(item.Category);
+            })
+            updateDropDownMenu(categories);
+        }
+    }
 }
 async function renderPosts(queryString) {
-    if (search != "") queryString += "&keywords=" + search;
+    let endOfData = false;
+    queryString += "&sort=category";
+    if (selectedCategory != "") queryString += "&category=" + selectedCategory;
     addWaitingGif();
-    let posts = await API.getPosts(queryString);
-    if (API.error)
-        renderError(API.currentHttpError);
-    else
-        if (posts.length > 0) {
-
-            posts.forEach(post => {
-                $("#postsPanel").append(renderPost(post));
+    let response = await Posts_API.Get(queryString);
+    if (!Posts_API.error) {
+        currentETag = response.ETag;
+        let Posts = response.data;
+        if (Posts.length > 0) {
+            Posts.forEach(Post => {
+                $("#itemsPanel").append(renderPost(Post));
             });
-        }
+            $(".editCmd").off();
+            $(".editCmd").on("click", function () {
+                renderEditPostForm($(this).attr("editPostId"));
+            });
+            $(".deleteCmd").off();
+            $(".deleteCmd").on("click", function () {
+                renderDeletePostForm($(this).attr("deletePostId"));
+            });
+        } else
+            endOfData = true;
+    } else {
+        renderError(Posts_API.currentHttpError);
+    }
+    removeWaitingGif();
+    return endOfData;
+}
+
+function renderError(message) {
+    hidePosts();
+    $("#actionTitle").text("Erreur du serveur...");
+    $("#errorContainer").show();
+    $("#errorContainer").append($(`<div>${message}</div>`));
+}
+function renderCreatePostForm() {
+    renderPostForm();
+}
+async function renderEditPostForm(id) {
+    addWaitingGif();
+    let response = await Posts_API.Get(id)
+    if (!Posts_API.error) {
+        let Post = response.data;
+        if (Post !== null)
+            renderPostForm(Post);
+        else
+            renderError("Post introuvable!");
+    } else {
+        renderError(Posts_API.currentHttpError);
+    }
     removeWaitingGif();
 }
-function addWaitingGif() {
-    $("#postsPanel").append($("<div id='waitingGif' class='waitingGifcontainer'><img class='waitingGif' src='Loading_icon.gif' /></div>'"));
-}
-function removeWaitingGif() {
-    $("#waitingGif").remove('');
-}
-function eraseContent() {
-    $("#content").empty();
-}
-function newPost() {
-    post = {};
-    post.Id = 0;
-    post.Title = "";
-    post.Category = "";
-    post.Text = "";
-    post.Creation = "";
-    return post;
-}
-function renderPostForm(post = null) {
-    $("#createPost").hide();
-    $("#abort").show();
-    eraseContent();
-    let create = post == null;
-    if (create) {
-        post = newPost();
-        post.Image = "images/default_news.png";
-    }
-    $("#actionTitle").text(create ? "Création" : "Modification");
-    $("#content").append(`
-        <form class="form" id="PostForm">
-            <input type="hidden" name="Id" value="${post.Id}"/>
-
-            <label for="Title" class="form-label">Titre </label>
-            <input 
-                class="form-control Alpha"
-                name="Title" 
-                id="Title" 
-                placeholder="Titre"
-                required
-                RequireMessage="Veuillez entrer un titre"
-                InvalidMessage="Le nom comporte un caractère illégal" 
-                value="${post.Title}"
-            />
-            <label for="Text" class="form-label">Texte </label>
-            <textarea
-                class="form-control Alpha"
-                name="Text" 
-                id="Text" 
-                placeholder="Texte"
-                required
-                RequireMessage="Veuillez entrer un texte"
-                InvalidMessage="Le texte comporte un caractère illégal" 
-                value="${post.Text}"
-            /></textarea>
-            <label for="Category" class="form-label">Catégorie </label>
-            <input 
-                class="form-control Alpha"
-                name="Category" 
-                id="Category"
-                placeholder="Catégorie"
-                required
-                RequireMessage="Veuillez entrer une catégorie"
-                InvalidMessage="La catégorie comporte un caractère illégal" 
-                value="${post.Category}"
-            />
-            <label for="Creation" class="form-label">Création </label>
-            <input 
-                class="form-control Alpha"
-                type="date"
-                name="Creation" 
-                id="Creation 
-                placeholder="Creation"
-                required
-                RequireMessage="Veuillez entrer une date"
-                InvalidMessage="La date comporte un caractère illégal" 
-                value="${post.Creation}"
-            />
-            <!-- nécessite le fichier javascript 'imageControl.js' -->
-            <label class="form-label">Image </label>
-            <div   class='imageUploader' 
-                   newImage='${create}' 
-                   controlId='Avatar' 
-                   imageSrc='${post.Image}' 
-                   waitingImage="Loading_icon.gif">
-            </div>
-            <hr>
-            <input type="submit" value="Enregistrer" id="savePost" class="btn btn-primary">
-            <input type="button" value="Annuler" id="cancel" class="btn btn-secondary">
-        </form>
-    `);
-    initImageUploaders();
-    initFormValidation(); // important do to after all html injection!
-    $('#PostForm').on("submit", async function (event) {
-        event.preventDefault();
-        let post = getFormData($("#PostForm"));
-        //showWaitingGif();
-        let result = await API.savePost(post, create);
-        if (result){
-            $("#content").append(
-                $(`
-                <div id="scrollPanel">
-                    <div id="postsPanel" class="postsContainer">
-           
+async function renderDeletePostForm(id) {
+    hidePosts();
+    $("#actionTitle").text("Retrait");
+    $('#postForm').show();
+    $('#postForm').empty();
+    let response = await Posts_API.Get(id)
+    if (!Posts_API.error) {
+        let Post = response.data;
+        let favicon = makeFavicon(Post.Url);
+        if (Post !== null) {
+            $("#bookmarkForm").append(`
+        <div class="BookmarkdeleteForm">
+            <h4>Effacer le favori suivant?</h4>
+            <br>
+            <div class="BookmarkRow" id=${Post.Id}">
+                <div class="BookmarkContainer noselect">
+                    <div class="BookmarkLayout">
+                        <div class="Bookmark">
+                            <a href="${Post.Url}" target="_blank"> ${favicon} </a>
+                            <span class="BookmarkTitle">${Post.Title}</span>
+                        </div>
+                        <span class="BookmarkCategory">${Post.Category}</span>
+                    </div>
+                    <div class="BookmarkCommandPanel">
+                        <span class="editCmd cmdIcon fa fa-pencil" editBookmarkId="${Bookmark.Id}" title="Modifier ${Bookmark.Title}"></span>
+                        <span class="deleteCmd cmdIcon fa fa-trash" deleteBookmarkId="${Bookmark.Id}" title="Effacer ${Bookmark.Title}"></span>
                     </div>
                 </div>
-                `)
-            );
-            renderPosts();
+            </div>   
+            <br>
+            <input type="button" value="Effacer" id="deleteBookmark" class="btn btn-primary">
+            <input type="button" value="Annuler" id="cancel" class="btn btn-secondary">
+        </div>    
+        `);
+            $('#deletePost').on("click", async function () {
+                await Posts_API.Delete(Post.Id);
+                if (!Posts_API.error) {
+                    showPosts();
+                    pageManager.update(false);
+                    compileCategories();
+                }
+                else {
+                    console.log(Posts_API.currentHttpError)
+                    renderError("Une erreur est survenue!");
+                }
+            });
+            $('#cancel').on("click", function () {
+                showPosts();
+            });
+
+        } else {
+            renderError("Post introuvable!");
         }
-        else{
-            renderError("Une erreur est survenue! " + API.setHttpErrorState());
-        }
-    });
-    $('#cancel').on("click", function () {
-        eraseContent();
-        $("#aboutContainer").hide();
-        $("#errorContainer").hide();
-        $("#abort").hide();
-        $("#search").show();
-        $("#scrollPanel").show();        
-        $("#createPost").show();
-        $("#actionTitle").text("Nouvelles");
-        $('#content').empty();
-        $("#content").append(
-            $(`
-            <div id="scrollPanel">
-                <div id="postsPanel" class="postsContainer">
-       
-                </div>
-            </div>
-            `)
-        );
-        renderPosts();
-    });
+    } else
+        renderError(Posts_API.currentHttpError);
 }
 function getFormData($form) {
     const removeTag = new RegExp("(<[a-zA-Z0-9]+>)|(</[a-zA-Z0-9]+>)", "g");
@@ -238,43 +245,118 @@ function getFormData($form) {
     });
     return jsonObject;
 }
+function newBookmark() {
+    Bookmark = {};
+    Bookmark.Id = 0;
+    Bookmark.Title = "";
+    Bookmark.Url = "";
+    Bookmark.Category = "";
+    return Bookmark;
+}
+function renderBookmarkForm(Bookmark = null) {
+    hideBookmarks();
+    let create = Bookmark == null;
+    let favicon = `<div class="big-favicon"></div>`;
+    if (create)
+        Bookmark = newBookmark();
+    else
+        favicon = makeFavicon(Bookmark.Url, true);
+    $("#actionTitle").text(create ? "Création" : "Modification");
+    $("#bookmarkForm").show();
+    $("#bookmarkForm").empty();
+    $("#bookmarkForm").append(`
+        <form class="form" id="BookmarkForm">
+            <a href="${Bookmark.Url}" target="_blank" id="faviconLink" class="big-favicon" > ${favicon} </a>
+            <br>
+            <input type="hidden" name="Id" value="${Bookmark.Id}"/>
 
-function renderPost(post) {
-    let date = convertToFrenchDate(post.Creation); 
+            <label for="Title" class="form-label">Titre </label>
+            <input 
+                class="form-control Alpha"
+                name="Title" 
+                id="Title" 
+                placeholder="Titre"
+                required
+                RequireMessage="Veuillez entrer un titre"
+                InvalidMessage="Le titre comporte un caractère illégal"
+                value="${Bookmark.Title}"
+            />
+            <label for="Url" class="form-label">Url </label>
+            <input
+                class="form-control URL"
+                name="Url"
+                id="Url"
+                placeholder="Url"
+                required
+                value="${Bookmark.Url}" 
+            />
+            <label for="Category" class="form-label">Catégorie </label>
+            <input 
+                class="form-control"
+                name="Category"
+                id="Category"
+                placeholder="Catégorie"
+                required
+                value="${Bookmark.Category}"
+            />
+            <br>
+            <input type="submit" value="Enregistrer" id="saveBookmark" class="btn btn-primary">
+            <input type="button" value="Annuler" id="cancel" class="btn btn-secondary">
+        </form>
+    `);
+    initFormValidation();
+    $("#Url").on("change", function () {
+        let favicon = makeFavicon($("#Url").val(), true);
+        $("#faviconLink").empty();
+        $("#faviconLink").attr("href", $("#Url").val());
+        $("#faviconLink").append(favicon);
+    })
+    $('#BookmarkForm').on("submit", async function (event) {
+        event.preventDefault();
+        let Bookmark = getFormData($("#BookmarkForm"));
+        Bookmark = await Bookmarks_API.Save(Bookmark, create);
+        if (!Bookmarks_API.error) {
+            showBookmarks();
+            await pageManager.update(false);
+            compileCategories();
+            let b = $("#bookmark_" + Bookmark.Id);
+            console.log(b, b.offset().top);
+            $("#scrollPanel").scrollTop(b.offset().top);
+        }
+        else
+            renderError("Une erreur est survenue!");
+    });
+    $('#cancel').on("click", function () {
+        showBookmarks();
+    });
+}
+function makeFavicon(url, big = false) {
+    // Utiliser l'API de google pour extraire le favicon du site pointé par url
+    // retourne un élément div comportant le favicon en tant qu'image de fond
+    ///////////////////////////////////////////////////////////////////////////
+    if (url.slice(-1) != "/") url += "/";
+    let faviconClass = "favicon";
+    if (big) faviconClass = "big-favicon";
+    url = "http://www.google.com/s2/favicons?sz=64&domain=" + url;
+    return `<div class="${faviconClass}" style="background-image: url('${url}');"></div>`;
+}
+function renderBookmark(Bookmark) {
+    let favicon = makeFavicon(Bookmark.Url);
     return $(`
-     <div class="postRow" post_id=${post.Id}">
-        <div class="postContainer noselect">
-            <div class="postLayout">
-                <div class="postInfo">
-                    <span class="postCategory">${post.Category}</span>
-                    <div class="postCommandPanel">
-                        <span class="editCmd cmdIcon fa-solid fa-square-pen" editPostId="${post.Id}" title="Modifier ${post.Title}"></span>
-                        <span class="deleteCmd cmdIcon fa-solid fa-square-xmark" deletePostId="${post.Id}" title="Effacer ${post.Title}"></span>
-                    </div>   
+     <div class="BookmarkRow" id='bookmark_${Bookmark.Id}'>
+        <div class="BookmarkContainer noselect">
+            <div class="BookmarkLayout">
+                <div class="Bookmark">
+                    <a href="${Bookmark.Url}" target="_blank"> ${favicon} </a>
+                    <span class="BookmarkTitle">${Bookmark.Title}</span>
                 </div>
-                <div class="postTitle">${post.Title}
-                <div class="postImage" style="background-image:url('${post.Image}')"></div>
-                <span class="postDate">${date}</span>
-                <div class="postText">${post.Text}</div>
+                <span class="BookmarkCategory">${Bookmark.Category}</span>
+            </div>
+            <div class="BookmarkCommandPanel">
+                <span class="editCmd cmdIcon fa fa-pencil" editBookmarkId="${Bookmark.Id}" title="Modifier ${Bookmark.Title}"></span>
+                <span class="deleteCmd cmdIcon fa fa-trash" deleteBookmarkId="${Bookmark.Id}" title="Effacer ${Bookmark.Title}"></span>
             </div>
         </div>
-    </div> 
-         
+    </div>           
     `);
-}
-function convertToFrenchDate(numeric_date) {
-    date = new Date(numeric_date);
-    var options = { year: 'numeric', month: 'long', day: 'numeric' };
-    var opt_weekday = { weekday: 'long' };
-    var weekday = toTitleCase(date.toLocaleDateString("fr-FR", opt_weekday));
-
-    function toTitleCase(str) {
-        return str.replace(
-            /\w\S*/g,
-            function (txt) {
-                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-            }
-        );
-    }
-    return weekday + " le " + date.toLocaleDateString("fr-FR", options) + " @ " + date.toLocaleTimeString("fr-FR");
 }
