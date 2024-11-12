@@ -23,25 +23,37 @@
     padding-right: 10px;
     height: 32px !important;
     vertical-align: middle;
+    width:100%;
 }
 
 #search {
     display:grid;
-    width: 190px;
-    grid-template-columns: 185px 30px;
+    grid-template-columns: auto 30px;
     align-items: center;
-    justify-self:right;
-    margin-right:30px;
 }
 
 .wordRow {
     scroll-snap-align: start;
 }
 hr {
-    margin:0px;
+    margin-top:0px;
+    margin-bottom:0px;
+    margin-right:3vh;
+    margin-left:3vh;
+
 }
 
 .postRow{
-    height:75vh;
+    min-height:80vh;
     
 }
+
+#Text{
+    height:25vh
+}
+
+.moreTextDiv{
+    margin: auto;
+    text-align:center;
+}
+#more {display: none;}

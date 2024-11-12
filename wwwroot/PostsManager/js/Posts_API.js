@@ -50,6 +50,7 @@ class Posts_API {
         });
     }
     static async Save(post, create = true) {
+        console.log(post);
         Posts_API.initHttpState();
         return new Promise(resolve => {
             $.ajax({

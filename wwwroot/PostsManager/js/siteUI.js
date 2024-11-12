@@ -42,7 +42,7 @@ async function Init_UI() {
     start_Periodic_Refresh();
 }
 function showPosts() {
-    $("#actionTitle").text("Liste des favoris");
+    $("#actionTitle").text("Nouvelles");
     $("#scrollPanel").show();
     $('#abort').hide();
     $('#postForm').hide();
@@ -70,6 +70,11 @@ function start_Periodic_Refresh() {
         periodicRefreshPeriod * 1000);
 }
 function renderAbout() {
+    $("#scrollPanel").hide();
+    $("#abort").show();
+    $("#search").hide();
+    $("#actionTitle").text("À propos...");
+    $("#aboutContainer").show();
     hidePosts();
     $("#actionTitle").text("À propos...");
     $("#aboutContainer").show();
@@ -149,6 +154,10 @@ async function renderPosts(queryString) {
             $(".deleteCmd").on("click", function () {
                 renderDeletePostForm($(this).attr("deletePostId"));
             });
+            $('#moreText').on("click", function () {
+                textMaxCaracters = textWithBack;
+                console.log("hhelo");
+            });
         } else
             endOfData = true;
     } else {
@@ -189,9 +198,9 @@ async function renderDeletePostForm(id) {
     let response = await Posts_API.Get(id)
     if (!Posts_API.error) {
         let Post = response.data;
-        let favicon = makeFavicon(Post.Url);
+      
         if (Post !== null) {
-            $("#bookmarkForm").append(`
+            $("#postForm").append(`
         <div class="PostdeleteForm">
             <h4>Effacer le favori suivant?</h4>
             <br>
@@ -199,19 +208,19 @@ async function renderDeletePostForm(id) {
                 <div class="PostContainer noselect">
                     <div class="PostLayout">
                         <div class="Post">
-                            <a href="${Post.Url}" target="_blank"> ${favicon} </a>
+                           
                             <span class="PostTitle">${Post.Title}</span>
                         </div>
                         <span class="PostCategory">${Post.Category}</span>
                     </div>
                     <div class="PostCommandPanel">
-                        <span class="editCmd cmdIcon fa fa-pencil" editPostId="${Bookmark.Id}" title="Modifier ${Bookmark.Title}"></span>
-                        <span class="deleteCmd cmdIcon fa fa-trash" deletePostId="${Bookmark.Id}" title="Effacer ${Bookmark.Title}"></span>
+                        <span class="editCmd cmdIcon fa fa-pencil" editPostId="${Post.Id}" title="Modifier ${Post.Title}"></span>
+                        <span class="deleteCmd cmdIcon fa fa-trash" deletePostId="${Post.Id}" title="Effacer ${Post.Title}"></span>
                     </div>
                 </div>
             </div>   
             <br>
-            <input type="button" value="Effacer" id="deleteBookmark" class="btn btn-primary">
+            <input type="button" value="Effacer" id="deletePost" class="btn btn-primary">
             <input type="button" value="Annuler" id="cancel" class="btn btn-secondary">
         </div>    
         `);
@@ -246,14 +255,13 @@ function getFormData($form) {
     return jsonObject;
 }
 function newPost() {
-    Post= {};
-    Post.Id = 0;
-    Post.Title = "";
-    Post.Text = "";
-    Post.Category = "";
-    Post.Image="";
-    Post.Creation=0;
-    return Bookmark;
+    post = {};
+    post.Id = 0;
+    post.Title = "";
+    post.Category = "";
+    post.Text = "";
+    post.Creation = Date.now();
+    return post;
 }
 
 //RENDER POST   
@@ -261,19 +269,17 @@ function renderPostForm(Post = null) {
     hidePosts();
     let create = Post == null;
     //let favicon = `<div class="big-favicon"></div>`;
-    //if (create)
-        //Post = newPost();
-    //else
-       // favicon = makeFavicon(Post.Url, true);
+    if (create){
+        Post = newPost();
+        Post.Image = "images/default_news.png";
+    }
+
     $("#actionTitle").text(create ? "Création" : "Modification");
     $("#postForm").show();
     $("#postForm").empty();
     $("#postForm").append(`
-        <form class="form" id="PostForm">
-            <a href="${Post.Url}" target="_blank" id="faviconLink" class="big-favicon" > ${favicon} </a>
-            <br>
-            <input type="hidden" name="Id" value="${Bookmark.Id}"/>
-
+           <form class="form" id="PostForm">
+            <input type="hidden" name="Id" value="${Post.Id}"/>
             <label for="Title" class="form-label">Titre </label>
             <input 
                 class="form-control Alpha"
@@ -282,48 +288,62 @@ function renderPostForm(Post = null) {
                 placeholder="Titre"
                 required
                 RequireMessage="Veuillez entrer un titre"
-                InvalidMessage="Le titre comporte un caractère illégal"
-                value="${Bookmark.Title}"
+                InvalidMessage="Le nom comporte un caractère illégal" 
+                value="${Post.Title}"
             />
-            <label for="Url" class="form-label">Url </label>
-            <input
-                class="form-control URL"
-                name="Url"
-                id="Url"
-                placeholder="Url"
+            <label for="Text" class="form-label">Texte </label>
+            <textarea
+                class="form-control Alpha"
+                name="Text" 
+                id="Text" 
+                placeholder="Texte"
                 required
-                value="${Bookmark.Url}" 
-            />
+                RequireMessage="Veuillez entrer un texte"
+                InvalidMessage="Le texte comporte un caractère illégal" 
+                value="${Post.Text}"
+            /></textarea>
             <label for="Category" class="form-label">Catégorie </label>
             <input 
-                class="form-control"
-                name="Category"
+                class="form-control Alpha"
+                name="Category" 
                 id="Category"
                 placeholder="Catégorie"
                 required
-                value="${Bookmark.Category}"
+                RequireMessage="Veuillez entrer une catégorie"
+                InvalidMessage="La catégorie comporte un caractère illégal" 
+                value="${Post.Category}"
             />
-            <br>
-            <input type="submit" value="Enregistrer" id="saveBookmark" class="btn btn-primary">
+           
+            <!-- nécessite le fichier javascript 'imageControl.js' -->
+            <label class="form-label">Image </label>
+            <div   class='imageUploader' 
+                   newImage='${create}' 
+                   controlId='Image' 
+                   imageSrc='${Post.Image}' 
+                   waitingImage="Loading_icon.gif">
+            </div>
+            <hr>
+            <input type="submit" value="Enregistrer" id="savePost" class="btn btn-primary">
             <input type="button" value="Annuler" id="cancel" class="btn btn-secondary">
         </form>
     `);
-    initFormValidation();
-    $("#Url").on("change", function () {
+    initImageUploaders();
+    /*initFormValidation();
+    /*$("#Url").on("change", function () {
         let favicon = makeFavicon($("#Url").val(), true);
         $("#faviconLink").empty();
         $("#faviconLink").attr("href", $("#Url").val());
         $("#faviconLink").append(favicon);
-    })
-    $('#BookmarkForm').on("submit", async function (event) {
+    })*/
+    $('#PostForm').on("submit", async function (event) {
         event.preventDefault();
-        let Bookmark = getFormData($("#BookmarkForm"));
-        Bookmark = await Bookmarks_API.Save(Bookmark, create);
-        if (!Bookmarks_API.error) {
-            showBookmarks();
+        let post = getFormData($("#PostForm"));
+        post = await Posts_API.Save(post, create);
+        if (!Posts_API.error) {
+            showPosts();
             await pageManager.update(false);
             compileCategories();
-            let b = $("#bookmark_" + Bookmark.Id);
+            let b = $("#post_" + post.Id);
             console.log(b, b.offset().top);
             $("#scrollPanel").scrollTop(b.offset().top);
         }
@@ -331,10 +351,24 @@ function renderPostForm(Post = null) {
             renderError("Une erreur est survenue!");
     });
     $('#cancel').on("click", function () {
-        showBookmarks();
+        renderPosts();
     });
+   /* $('#postForm').on("submit", async function (event) {
+        event.preventDefault();
+        let post = getFormData($("#postForm"));
+        showWaitingGif();
+        let result = await API_SavePost(post, create);
+        if (result)
+            renderPosts();
+        else
+            renderError("Une erreur est survenue! " + API_getcurrentHttpError());
+    });
+    $('#cancel').on("click", function () {
+        renderPosts();
+    });*/
+
 }
-function makeFavicon(url, big = false) {
+/*function makeFavicon(url, big = false) {
     // Utiliser l'API de google pour extraire le favicon du site pointé par url
     // retourne un élément div comportant le favicon en tant qu'image de fond
     ///////////////////////////////////////////////////////////////////////////
@@ -343,26 +377,65 @@ function makeFavicon(url, big = false) {
     if (big) faviconClass = "big-favicon";
     url = "http://www.google.com/s2/favicons?sz=64&domain=" + url;
     return `<div class="${faviconClass}" style="background-image: url('${url}');"></div>`;
-}
+}*/
 
 //RENDER POST
-function renderPost(Bookmark) {
-    let favicon = makeFavicon(Bookmark.Url);
+function renderPost(post) {
+    let date = convertToFrenchDate(post.Creation); 
+    let textWithBack = post.Text.replace("\r\n\r\n", "<br>");
+    let textMaxCaracters = textWithBack.substring(0,200);
+    let textRest = textWithBack.substring(200);
+    let allText = `${textMaxCaracters}<span id="dots-${post.Id}">...</span><span id="more-${post.Id}" style="display:none;">${textRest}</span>`;
+    //let allText = `${textMaxCaracters}<span id="more-${post.Id}" style="display:none;">${textRest}</span>`;
+
     return $(`
-     <div class="BookmarkRow" id='bookmark_${Bookmark.Id}'>
-        <div class="BookmarkContainer noselect">
-            <div class="BookmarkLayout">
-                <div class="Bookmark">
-                    <a href="${Bookmark.Url}" target="_blank"> ${favicon} </a>
-                    <span class="BookmarkTitle">${Bookmark.Title}</span>
+     <div class="postRow" post_id=${post.Id}">
+        <div class="postContainer noselect">
+            <div class="postLayout">
+                <div class="postInfo">
+                    <span class="postCategory">${post.Category}</span>
+                    <div class="postCommandPanel">
+                        <span class="editCmd cmdIcon fa-solid fa-square-pen" editPostId="${post.Id}" title="Modifier ${post.Title}"></span>
+                        <span class="deleteCmd cmdIcon fa-solid fa-square-xmark" deletePostId="${post.Id}" title="Effacer ${post.Title}"></span>
+                    </div>   
                 </div>
-                <span class="BookmarkCategory">${Bookmark.Category}</span>
-            </div>
-            <div class="BookmarkCommandPanel">
-                <span class="editCmd cmdIcon fa fa-pencil" editBookmarkId="${Bookmark.Id}" title="Modifier ${Bookmark.Title}"></span>
-                <span class="deleteCmd cmdIcon fa fa-trash" deleteBookmarkId="${Bookmark.Id}" title="Effacer ${Bookmark.Title}"></span>
+                <div class="postTitle">${post.Title}</div>
+                <div class="postImage" style="background-image:url('${post.Image}')"></div>
+                <span class="postDate">${date}</span>
+                <div class="postText">${allText}</div>
             </div>
         </div>
-    </div>           
+    </div> 
+    <hr>
+    <div class="moreTextDiv">
+        <i title="Voir plus"class="cmdIcon fa fa-angle-double-down moreTextIcon" data-id="${post.Id}">
+    <div>
+         
     `);
+    
+    
+}
+$(document).on("click", ".moreTextIcon", function () {
+    console.log("click");
+    let postId = $(this).data("id");
+    $(`#dots-${postId}`).toggle();
+    $(`#more-${postId}`).toggle();
+
+    $(this).toggleClass("fa-angle-double-down fa-angle-double-up");
+});
+
+function convertToFrenchDate(numeric_date) {
+    date = new Date(numeric_date);
+    var options = { year: 'numeric', month: 'long', day: 'numeric' };
+    var opt_weekday = { weekday: 'long' };
+    var weekday = toTitleCase(date.toLocaleDateString("fr-FR", opt_weekday));
+    function toTitleCase(str) {
+        return str.replace(
+            /\w\S*/g,
+            function (txt) {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            }
+        );
+    }
+    return weekday + " le " + date.toLocaleDateString("fr-FR", options) + " @ " + date.toLocaleTimeString("fr-FR");
 }
