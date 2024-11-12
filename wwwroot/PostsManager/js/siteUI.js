@@ -181,6 +181,7 @@ async function renderEditPostForm(id) {
     let response = await Posts_API.Get(id)
     if (!Posts_API.error) {
         let Post = response.data;
+        console.log(response.data);
         if (Post !== null)
             renderPostForm(Post);
         else
@@ -273,7 +274,6 @@ function renderPostForm(Post = null) {
         Post = newPost();
         Post.Image = "images/default_news.png";
     }
-
     $("#actionTitle").text(create ? "Création" : "Modification");
     $("#postForm").show();
     $("#postForm").empty();
@@ -301,7 +301,7 @@ function renderPostForm(Post = null) {
                 RequireMessage="Veuillez entrer un texte"
                 InvalidMessage="Le texte comporte un caractère illégal" 
                 value="${Post.Text}"
-            /></textarea>
+            />${Post.Text}</textarea>
             <label for="Category" class="form-label">Catégorie </label>
             <input 
                 class="form-control Alpha"
@@ -316,11 +316,14 @@ function renderPostForm(Post = null) {
            
             <!-- nécessite le fichier javascript 'imageControl.js' -->
             <label class="form-label">Image </label>
+             <div   class='imageUploaderContainer' >
             <div   class='imageUploader' 
                    newImage='${create}' 
                    controlId='Image' 
                    imageSrc='${Post.Image}' 
                    waitingImage="Loading_icon.gif">
+                   
+            </div>
             </div>
             <hr>
             <input type="submit" value="Enregistrer" id="savePost" class="btn btn-primary">
@@ -328,13 +331,7 @@ function renderPostForm(Post = null) {
         </form>
     `);
     initImageUploaders();
-    /*initFormValidation();
-    /*$("#Url").on("change", function () {
-        let favicon = makeFavicon($("#Url").val(), true);
-        $("#faviconLink").empty();
-        $("#faviconLink").attr("href", $("#Url").val());
-        $("#faviconLink").append(favicon);
-    })*/
+   
     $('#PostForm').on("submit", async function (event) {
         event.preventDefault();
         let post = getFormData($("#PostForm"));
@@ -368,16 +365,7 @@ function renderPostForm(Post = null) {
     });*/
 
 }
-/*function makeFavicon(url, big = false) {
-    // Utiliser l'API de google pour extraire le favicon du site pointé par url
-    // retourne un élément div comportant le favicon en tant qu'image de fond
-    ///////////////////////////////////////////////////////////////////////////
-    if (url.slice(-1) != "/") url += "/";
-    let faviconClass = "favicon";
-    if (big) faviconClass = "big-favicon";
-    url = "http://www.google.com/s2/favicons?sz=64&domain=" + url;
-    return `<div class="${faviconClass}" style="background-image: url('${url}');"></div>`;
-}*/
+
 
 //RENDER POST
 function renderPost(post) {

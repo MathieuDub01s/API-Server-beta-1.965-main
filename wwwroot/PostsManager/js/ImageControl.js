@@ -84,6 +84,7 @@ function initImageUploaders() {
         $(this).css("padding-bottom","3px");
 
         let imageData = $(this).attr('imageSrc');
+        
         $(this).append(`<img 
                          id="${controlId}_UploadedImage" 
                          name="${controlId}_UploadedImage" 
@@ -104,12 +105,14 @@ function initImageUploaders() {
                             id="${controlId}" 
                             name="${controlId}" 
                             required
+                        
                             RequireMessage ="${missingFileErrorMessage}" 
                             waitingImage ="${waitingImage}">`);
         } else {
             $(this).append(`<input 
                             id="${controlId}" 
                             name="${controlId}" 
+                            
                             waitingImage ="${waitingImage}">`);
         }
         
