@@ -192,21 +192,21 @@ async function renderDeletePostForm(id) {
         let favicon = makeFavicon(Post.Url);
         if (Post !== null) {
             $("#bookmarkForm").append(`
-        <div class="BookmarkdeleteForm">
+        <div class="PostdeleteForm">
             <h4>Effacer le favori suivant?</h4>
             <br>
-            <div class="BookmarkRow" id=${Post.Id}">
-                <div class="BookmarkContainer noselect">
-                    <div class="BookmarkLayout">
-                        <div class="Bookmark">
+            <div class="PostRow" id=${Post.Id}">
+                <div class="PostContainer noselect">
+                    <div class="PostLayout">
+                        <div class="Post">
                             <a href="${Post.Url}" target="_blank"> ${favicon} </a>
-                            <span class="BookmarkTitle">${Post.Title}</span>
+                            <span class="PostTitle">${Post.Title}</span>
                         </div>
-                        <span class="BookmarkCategory">${Post.Category}</span>
+                        <span class="PostCategory">${Post.Category}</span>
                     </div>
-                    <div class="BookmarkCommandPanel">
-                        <span class="editCmd cmdIcon fa fa-pencil" editBookmarkId="${Bookmark.Id}" title="Modifier ${Bookmark.Title}"></span>
-                        <span class="deleteCmd cmdIcon fa fa-trash" deleteBookmarkId="${Bookmark.Id}" title="Effacer ${Bookmark.Title}"></span>
+                    <div class="PostCommandPanel">
+                        <span class="editCmd cmdIcon fa fa-pencil" editPostId="${Bookmark.Id}" title="Modifier ${Bookmark.Title}"></span>
+                        <span class="deleteCmd cmdIcon fa fa-trash" deletePostId="${Bookmark.Id}" title="Effacer ${Bookmark.Title}"></span>
                     </div>
                 </div>
             </div>   
@@ -245,28 +245,32 @@ function getFormData($form) {
     });
     return jsonObject;
 }
-function newBookmark() {
-    Bookmark = {};
-    Bookmark.Id = 0;
-    Bookmark.Title = "";
-    Bookmark.Url = "";
-    Bookmark.Category = "";
+function newPost() {
+    Post= {};
+    Post.Id = 0;
+    Post.Title = "";
+    Post.Text = "";
+    Post.Category = "";
+    Post.Image="";
+    Post.Creation=0;
     return Bookmark;
 }
-function renderBookmarkForm(Bookmark = null) {
-    hideBookmarks();
-    let create = Bookmark == null;
-    let favicon = `<div class="big-favicon"></div>`;
-    if (create)
-        Bookmark = newBookmark();
-    else
-        favicon = makeFavicon(Bookmark.Url, true);
+
+//RENDER POST   
+function renderPostForm(Post = null) {
+    hidePosts();
+    let create = Post == null;
+    //let favicon = `<div class="big-favicon"></div>`;
+    //if (create)
+        //Post = newPost();
+    //else
+       // favicon = makeFavicon(Post.Url, true);
     $("#actionTitle").text(create ? "Création" : "Modification");
-    $("#bookmarkForm").show();
-    $("#bookmarkForm").empty();
-    $("#bookmarkForm").append(`
-        <form class="form" id="BookmarkForm">
-            <a href="${Bookmark.Url}" target="_blank" id="faviconLink" class="big-favicon" > ${favicon} </a>
+    $("#postForm").show();
+    $("#postForm").empty();
+    $("#postForm").append(`
+        <form class="form" id="PostForm">
+            <a href="${Post.Url}" target="_blank" id="faviconLink" class="big-favicon" > ${favicon} </a>
             <br>
             <input type="hidden" name="Id" value="${Bookmark.Id}"/>
 
@@ -340,7 +344,9 @@ function makeFavicon(url, big = false) {
     url = "http://www.google.com/s2/favicons?sz=64&domain=" + url;
     return `<div class="${faviconClass}" style="background-image: url('${url}');"></div>`;
 }
-function renderBookmark(Bookmark) {
+
+//RENDER POST
+function renderPost(Bookmark) {
     let favicon = makeFavicon(Bookmark.Url);
     return $(`
      <div class="BookmarkRow" id='bookmark_${Bookmark.Id}'>
