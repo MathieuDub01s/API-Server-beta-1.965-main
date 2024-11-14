@@ -396,11 +396,11 @@ function renderPost(post) {
                 <div class="postText">${allText}</div>
             </div>
         </div>
-    </div> 
-    <hr>
+         <hr>
     <div class="moreTextDiv">
         <i title="Voir plus"class="cmdIcon fa fa-angle-double-down moreTextIcon" data-id="${post.Id}">
     <div>
+    </div> 
     `);
     
     
