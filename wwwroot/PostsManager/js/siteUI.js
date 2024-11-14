@@ -31,7 +31,7 @@ async function Init_UI() {
         renderCreatePostForm();
     });
     $('#abort').on("click", async function () {
-        showPosts()
+        showPosts();
     });
     $('#aboutCmd').on("click", function () {
         renderAbout();
@@ -348,7 +348,7 @@ function renderPostForm(Post = null) {
             renderError("Une erreur est survenue!");
     });
     $('#cancel').on("click", function () {
-        renderPosts();
+        showPosts();
     });
    /* $('#postForm').on("submit", async function (event) {
         event.preventDefault();
