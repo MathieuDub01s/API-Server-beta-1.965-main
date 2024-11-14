@@ -4,6 +4,9 @@
     width:100%;
 }
 
+#searchKey:focus{
+    outline: none;
+}
 .wordContainer {
     height: 28px;
     padding-left: 10px;
