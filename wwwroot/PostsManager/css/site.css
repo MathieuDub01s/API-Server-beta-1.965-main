@@ -67,6 +67,7 @@ h4{
     scroll-snap-type: y mandatory;
     background-color: white;
     padding-bottom: 8px;
+    scroll-snap-type: y mandatory;
 }
 
 ::-webkit-scrollbar {
