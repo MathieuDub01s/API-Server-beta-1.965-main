@@ -6,7 +6,7 @@ let hold_Periodic_Refresh = false;
 let pageManager;
 let waitingGifTrigger = 2000;
 let waiting = null;
-
+let search = "";
 function addWaitingGif() {
     clearTimeout(waiting);
     waiting = setTimeout(() => {
@@ -36,11 +36,60 @@ async function Init_UI() {
     $('#aboutCmd').on("click", function () {
         renderAbout();
     });
+    $("#search").on('change', '#searchKey',function() {
+        doSearch();
+    })
+    $('#search').on('press', '#doSearch',function() {
+        doSearch();
+    });
     showPosts();
     $("#postForm").hide();
     $("#aboutContainer").hide();
     start_Periodic_Refresh();
 }
+function doSearch() {
+    search = $("#searchKey").val().replace(' ', ',');
+    pageManager.reset();
+    // if(search.length > 1){
+    // setTimeout(highlightSearch,250);
+    // }
+}
+
+function highlightSearch() {
+    let searchWord = search; // Get the search word (make sure 'search' is defined elsewhere)
+    // Ensure .postTitle and .postText exist and have content
+    let contentHtml = $('.postTitle').html();
+    let contentText = $('.postText').html();
+    // Function to highlight the search word in a given content
+    function highlightContent(content) {
+        if (searchWord && content && content.includes(searchWord)) {
+            // Escape the search word in case it contains special regex characters
+            const escapedSearchWord = escapeRegExp(searchWord);
+            
+            // Create a regular expression with global and case-insensitive flags
+            const regex = new RegExp(`(${escapedSearchWord})`, 'gi');
+            
+            // Replace all instances of searchWord with a <span> element to highlight it
+            return content.replace(regex, '<span style="background-color: yellow;">$1</span>');
+        }
+        return content;
+    }
+    // Highlight both postTitle and postText
+    if (contentHtml) {
+        const highlightedTitle = highlightContent(contentHtml);
+        $('.postTitle').html(highlightedTitle); // Set the highlighted HTML back to .postTitle
+    }
+    if (contentText) {
+        const highlightedText = highlightContent(contentText);
+        $('.postText').html(highlightedText); // Set the highlighted HTML back to .postText
+    }
+}
+
+// Utility function to escape special regex characters
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, '\\$&');
+}
+
 function showPosts() {
     $("#actionTitle").text("Nouvelles");
     $("#scrollPanel").show();
@@ -135,7 +184,8 @@ async function compileCategories() {
 }
 async function renderPosts(queryString) {
     let endOfData = false;
-    queryString += "&sort=category";
+    queryString += "&sort=Creation";
+    if (search != "") queryString += "&keywords=" + search;
     if (selectedCategory != "") queryString += "&category=" + selectedCategory;
     addWaitingGif();
     let response = await Posts_API.Get(queryString);
@@ -366,10 +416,7 @@ function renderPostForm(Post = null) {
     $('#cancel').on("click", function () {
         renderPosts();
     });*/
-
 }
-
-
 //RENDER POST
 function renderPost(post) {
     let date = convertToFrenchDate(post.Creation); 
@@ -390,10 +437,10 @@ function renderPost(post) {
                         <span class="deleteCmd cmdIcon fa-solid fa-square-xmark" deletePostId="${post.Id}" title="Effacer ${post.Title}"></span>
                     </div>   
                 </div>
-                <div class="postTitle">${post.Title}</div>
+                <div class="postTitle"><p>${post.Title}</p></div>
                 <div class="postImage" style="background-image:url('${post.Image}')"></div>
                 <span class="postDate">${date}</span>
-                <div class="postText">${allText}</div>
+                <div class="postText"><p>${allText}</p></div>
             </div>
         </div>
          <hr>
@@ -402,8 +449,6 @@ function renderPost(post) {
     <div>
     </div> 
     `);
-    
-    
 }
 $(document).on("click", ".moreTextIcon", function () {
     console.log("click");
@@ -413,7 +458,6 @@ $(document).on("click", ".moreTextIcon", function () {
 
     $(this).toggleClass("fa-angle-double-down fa-angle-double-up");
 });
-
 function convertToFrenchDate(numeric_date) {
     date = new Date(numeric_date);
     var options = { year: 'numeric', month: 'long', day: 'numeric' };
