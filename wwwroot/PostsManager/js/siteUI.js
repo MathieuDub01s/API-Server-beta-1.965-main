@@ -50,44 +50,6 @@ async function Init_UI() {
 function doSearch() {
     search = $("#searchKey").val().replace(' ', ',');
     pageManager.reset();
-    // if(search.length > 1){
-    // setTimeout(highlightSearch,250);
-    // }
-}
-
-function highlightSearch() {
-    let searchWord = search; // Get the search word (make sure 'search' is defined elsewhere)
-    // Ensure .postTitle and .postText exist and have content
-    let contentHtml = $('.postTitle').html();
-    let contentText = $('.postText').html();
-    // Function to highlight the search word in a given content
-    function highlightContent(content) {
-        if (searchWord && content && content.includes(searchWord)) {
-            // Escape the search word in case it contains special regex characters
-            const escapedSearchWord = escapeRegExp(searchWord);
-            
-            // Create a regular expression with global and case-insensitive flags
-            const regex = new RegExp(`(${escapedSearchWord})`, 'gi');
-            
-            // Replace all instances of searchWord with a <span> element to highlight it
-            return content.replace(regex, '<span style="background-color: yellow;">$1</span>');
-        }
-        return content;
-    }
-    // Highlight both postTitle and postText
-    if (contentHtml) {
-        const highlightedTitle = highlightContent(contentHtml);
-        $('.postTitle').html(highlightedTitle); // Set the highlighted HTML back to .postTitle
-    }
-    if (contentText) {
-        const highlightedText = highlightContent(contentText);
-        $('.postText').html(highlightedText); // Set the highlighted HTML back to .postText
-    }
-}
-
-// Utility function to escape special regex characters
-function escapeRegExp(string) {
-    return string.replace(/[.*+?^=!:${}()|\[\]\/\\]/g, '\\$&');
 }
 
 function showPosts() {
