@@ -19,7 +19,7 @@ function removeWaitingGif() {
 }
 
 Init_UI();
-
+let counter = 0;
 async function Init_UI() {
     let itemLayout = {
         width: $("#sample").outerWidth(),
@@ -32,6 +32,14 @@ async function Init_UI() {
     });
     $('#abort').on("click", async function () {
         showPosts();
+    });
+    $("[name='searchingQ']").on('click', function(){
+        counter++;
+        if(counter%2 == 1){
+            document.querySelector('.searchInput').style.display = 'block'; 
+        }else{
+            document.querySelector('.searchInput').style.display = 'none'; 
+        }
     });
     $('#aboutCmd').on("click", function () {
         renderAbout();
@@ -215,7 +223,7 @@ async function renderDeletePostForm(id) {
         if (Post !== null) {
             $("#postForm").append(`
         <div class="PostdeleteForm">
-            <h4>Effacer le favori suivant?</h4>
+            <h4>Effacer la nouvelle suivante?</h4>
             <br>
             <div class="PostRow" id=${Post.Id}">
                 <div class="PostContainer noselect">
@@ -224,11 +232,7 @@ async function renderDeletePostForm(id) {
                            
                             <span class="PostTitle">${Post.Title}</span>
                         </div>
-                        <span class="PostCategory">${Post.Category}</span>
-                    </div>
-                    <div class="PostCommandPanel">
-                        <span class="editCmd cmdIcon fa fa-pencil" editPostId="${Post.Id}" title="Modifier ${Post.Title}"></span>
-                        <span class="deleteCmd cmdIcon fa fa-trash" deletePostId="${Post.Id}" title="Effacer ${Post.Title}"></span>
+                           <div class="postImage" style="background-image:url('${Post.Image}')"></div>
                     </div>
                 </div>
             </div>   
