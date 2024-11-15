@@ -91,7 +91,7 @@ function start_Periodic_Refresh() {
 function renderAbout() {
     $("#scrollPanel").hide();
     $("#abort").show();
-    $("#search").hide();
+    //$("#search").hide();
     $("#actionTitle").text("À propos...");
     $("#aboutContainer").show();
     hidePosts();
