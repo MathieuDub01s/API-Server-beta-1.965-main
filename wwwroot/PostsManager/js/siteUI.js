@@ -146,7 +146,7 @@ async function compileCategories() {
 }
 async function renderPosts(queryString) {
     let endOfData = false;
-    queryString += "&sort=Creation";
+    queryString += "&sort=Creation,desc";
     if (search != "") queryString += "&keywords=" + search;
     if (selectedCategory != "") queryString += "&category=" + selectedCategory;
     addWaitingGif();
@@ -365,19 +365,6 @@ function renderPostForm(Post = null) {
     $('#cancel').on("click", function () {
         showPosts();
     });
-   /* $('#postForm').on("submit", async function (event) {
-        event.preventDefault();
-        let post = getFormData($("#postForm"));
-        showWaitingGif();
-        let result = await API_SavePost(post, create);
-        if (result)
-            renderPosts();
-        else
-            renderError("Une erreur est survenue! " + API_getcurrentHttpError());
-    });
-    $('#cancel').on("click", function () {
-        renderPosts();
-    });*/
 }
 //RENDER POST
 function renderPost(post) {
